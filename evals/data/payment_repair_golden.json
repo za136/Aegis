@@ -1,0 +1,50 @@
+[
+  {
+    "case_id": "PR-GOLDEN-01",
+    "description": "Beneficiary account closed at receiving bank (AC04)",
+    "payment_id": "pmt_ex_101",
+    "rejection_code": "AC04",
+    "creditor_name": "Delta Logistics",
+    "original_account": "US33WELL9988111",
+    "expected_is_repairable": true,
+    "expected_proposed_account": "US33WELL9988222",
+    "expected_status": "PENDING_APPROVAL",
+    "ground_truth_rationale": "Active secondary account identified in counterparty directory."
+  },
+  {
+    "case_id": "PR-GOLDEN-02",
+    "description": "Insufficient funds on ledger violating available balance invariant (AM04)",
+    "payment_id": "pmt_ex_am04",
+    "rejection_code": "AM04",
+    "creditor_name": "Acme Global Logistics",
+    "original_account": "US99BOFA8822001",
+    "expected_is_repairable": false,
+    "expected_proposed_account": null,
+    "expected_status": "UNREPAIRABLE",
+    "ground_truth_rationale": "Ledger invariant cannot be bypassed. Return payment or fund account."
+  },
+  {
+    "case_id": "PR-GOLDEN-03",
+    "description": "Unrecognized beneficiary name with DBA alias match (BE05)",
+    "payment_id": "pmt_ex_be05",
+    "rejection_code": "BE05",
+    "creditor_name": "Acme Logistics",
+    "original_account": "US99BOFA8822001",
+    "expected_is_repairable": true,
+    "expected_proposed_account": "US99BOFA8822001",
+    "expected_status": "PENDING_APPROVAL",
+    "ground_truth_rationale": "Beneficiary alias matched verified corporate profile."
+  },
+  {
+    "case_id": "PR-GOLDEN-04",
+    "description": "Account number transposition error with directory resolution (AC01)",
+    "payment_id": "pmt_ex_ac01",
+    "rejection_code": "AC01",
+    "creditor_name": "TechSupplies Corp",
+    "original_account": "US12MERI0002009",
+    "expected_is_repairable": true,
+    "expected_proposed_account": "US12MERI0002001",
+    "expected_status": "PENDING_APPROVAL",
+    "ground_truth_rationale": "Correct routing verified against internal ledger directory."
+  }
+]

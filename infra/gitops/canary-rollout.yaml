@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: api-gateway-canary
+  namespace: meridian-core
+  labels:
+    app: api-gateway
+spec:
+  replicas: 4
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: api-gateway
+  strategy:
+    canary:
+      canaryService: api-gateway-canary
+      stableService: api-gateway
+      trafficRouting:
+        nginx:
+          stableIngress: aegis-ingress
+      steps:
+        # Step 1: Route 10% traffic to canary (shadow & eval gate verification)
+        - setWeight: 10
+        - pause: { duration: 5m }
+        # Step 2: Route 25% traffic
+        - setWeight: 25
+        - pause: { duration: 10m }
+        # Step 3: Route 50% traffic
+        - setWeight: 50
+        - pause: { duration: 15m }
+        # Full promotion to 100%
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: aegis/api-gateway:0.1.0
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000

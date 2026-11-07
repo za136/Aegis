@@ -1,0 +1,67 @@
+{{- if .Values.networkPolicy.enabled }}
+# Core Banking Ledger Network Policy:
+# Only API Gateway and Internal DB clients can connect to PostgreSQL and Ledger
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: core-ledger-ingress-isolation
+  namespace: {{ .Values.namespaces.core }}
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              tier: banking-core
+        - namespaceSelector:
+            matchLabels:
+              tier: agent-platform
+          podSelector:
+            matchLabels:
+              role: tool-gateway-worker
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+# Agent Platform Network Policy:
+# Restricts public web egress to model provider endpoints; blocks arbitrary outbound traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: agent-platform-egress-boundary
+  namespace: {{ .Values.namespaces.agents }}
+spec:
+  podSelector:
+    matchLabels:
+      tier: agent-platform
+  policyTypes:
+    - Egress
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow HTTPS to Gemini API / external sanctioned endpoints
+    - ports:
+        - protocol: TCP
+          port: 443
+    # Allow connection to internal Core API Gateway and Redpanda
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              tier: banking-core
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 9092
+{{- end }}

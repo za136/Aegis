@@ -1,0 +1,16 @@
+apiVersion: v2
+name: aegis-platform
+description: Production Helm chart for Aegis / Meridian Agentic Payments & Banking Platform
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Meridian Banking Platform Team
+    email: platform-eng@meridian.bank
+keywords:
+  - banking
+  - payments
+  - agentic-ai
+  - financial-crime
+  - gemini
+  - mcp

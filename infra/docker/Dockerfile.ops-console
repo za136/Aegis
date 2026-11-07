@@ -1,0 +1,37 @@
+# syntax=docker/dockerfile:1
+# Multi-stage production Dockerfile for Next.js Operations & Risk Console
+
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json ./
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/api-client/package.json ./packages/api-client/
+COPY apps/ops-console/package.json ./apps/ops-console/
+RUN npm install
+
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build --workspace=packages/ui && \
+    npm run build --workspace=packages/api-client && \
+    npm run build --workspace=apps/ops-console
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production \
+    PORT=3001
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/apps/ops-console/public ./apps/ops-console/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/ops-console/.next ./apps/ops-console/.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/ops-console/package.json ./apps/ops-console/
+
+USER nextjs
+EXPOSE 3001
+
+CMD ["npm", "run", "start", "--workspace=apps/ops-console"]

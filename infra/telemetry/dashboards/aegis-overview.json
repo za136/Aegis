@@ -1,0 +1,50 @@
+{
+  "title": "Aegis & Meridian Platform Executive Overview",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Payments Processed (Total)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [{ "expr": "meridian_payments_processed_total" }]
+    },
+    {
+      "type": "stat",
+      "title": "Two-Phase Holds Reserved",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [{ "expr": "meridian_ledger_holds_reserved_total" }]
+    },
+    {
+      "type": "stat",
+      "title": "Tool Gateway Invocations",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [{ "expr": "sum(aegis_tool_gateway_invocations_total)" }]
+    },
+    {
+      "type": "stat",
+      "title": "Maker-Checker Approval Tickets (A1)",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [{ "expr": "aegis_maker_checker_tickets_total" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Adversarial Injections Intercepted vs SAR Verifier Audits",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        { "expr": "aegis_guardrail_injection_triggers_total", "legendFormat": "Injections Intercepted" },
+        { "expr": "aegis_verifier_rejections_total", "legendFormat": "Verifier Rejections" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tool Invocations by Squad",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        { "expr": "sum by (tool) (aegis_tool_gateway_invocations_total)", "legendFormat": "{{tool}}" }
+      ]
+    }
+  ]
+}

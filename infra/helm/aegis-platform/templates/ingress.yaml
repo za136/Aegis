@@ -1,0 +1,52 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aegis-ingress
+  namespace: {{ .Values.namespaces.core }}
+  annotations:
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts:
+        - "{{ .Values.global.domain }}"
+        - "portal.{{ .Values.global.domain }}"
+        - "ops.{{ .Values.global.domain }}"
+        - "api.{{ .Values.global.domain }}"
+      secretName: {{ .Values.global.tlsSecretName }}
+  rules:
+    # Customer Portal
+    - host: "portal.{{ .Values.global.domain }}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: customer-portal
+                port:
+                  number: 3000
+    # Operations Console
+    - host: "ops.{{ .Values.global.domain }}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ops-console
+                port:
+                  number: 3001
+    # Central API Gateway & MCP
+    - host: "api.{{ .Values.global.domain }}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000
+{{- end }}

@@ -1,0 +1,65 @@
+# syntax=docker/dockerfile:1
+# Multi-stage production Dockerfile for Aegis / Meridian API Gateway & Agent Platform
+
+# Stage 1: Build virtualenv & dependencies
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for rapid lockfile installation
+RUN pip install --no-cache-dir uv
+
+COPY pyproject.toml .
+RUN uv venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    uv pip install -e .
+
+# Stage 2: Minimal runtime image
+FROM python:3.12-slim AS runner
+
+WORKDIR /app
+
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    ENVIRONMENT=production \
+    PORT=8000
+
+# Install runtime PostgreSQL client library
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root system user for security compliance
+RUN groupadd -g 1001 appgroup && \
+    useradd -u 1001 -g appgroup -s /bin/bash -m appuser
+
+COPY --from=builder /opt/venv /opt/venv
+COPY --chown=appuser:appgroup apps/ /app/apps/
+COPY --chown=appuser:appgroup services/ /app/services/
+COPY --chown=appuser:appgroup agent_platform/ /app/agent_platform/
+COPY --chown=appuser:appgroup simulators/ /app/simulators/
+COPY --chown=appuser:appgroup data/ /app/data/
+COPY --chown=appuser:appgroup evals/ /app/evals/
+COPY --chown=appuser:appgroup pyproject.toml /app/
+
+USER appuser
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=5s \
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+
+CMD ["uvicorn", "apps.api_gateway.main:app", "--host", "0.0.0.0", "--port", "8000"]

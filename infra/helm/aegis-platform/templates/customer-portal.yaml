@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-portal
+  namespace: {{ .Values.namespaces.core }}
+  labels:
+    app: customer-portal
+    tier: banking-core
+spec:
+  replicas: {{ .Values.customerPortal.replicaCount }}
+  selector:
+    matchLabels:
+      app: customer-portal
+  template:
+    metadata:
+      labels:
+        app: customer-portal
+        tier: banking-core
+    spec:
+      containers:
+        - name: customer-portal
+          image: "{{ .Values.customerPortal.image.repository }}:{{ .Values.customerPortal.image.tag }}"
+          imagePullPolicy: {{ .Values.customerPortal.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: "https://api.{{ .Values.global.domain }}/api/v1"
+          resources:
+            {{- toYaml .Values.customerPortal.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customer-portal
+  namespace: {{ .Values.namespaces.core }}
+  labels:
+    app: customer-portal
+spec:
+  type: {{ .Values.customerPortal.service.type }}
+  ports:
+    - port: {{ .Values.customerPortal.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: customer-portal

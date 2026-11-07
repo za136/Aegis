@@ -1,0 +1,114 @@
+[
+  {
+    "case_id": "ONB-GOLDEN-01",
+    "description": "Clean individual consumer with valid US passport",
+    "applicant_type": "INDIVIDUAL",
+    "legal_name": "Jennifer Clark",
+    "email": "jennifer.clark@example.com",
+    "declared_dob": "1992-08-20",
+    "declared_address": "456 Elm St, New York, NY 10001",
+    "documents": [
+      {
+        "doc_type": "PASSPORT",
+        "document_number": "P77112233",
+        "raw_content": "Passport of Jennifer Clark valid through 2031",
+        "expiry_date": "2031-10-15",
+        "holder_name": "Jennifer Clark"
+      }
+    ],
+    "expected_risk_rating": "LOW",
+    "expected_action": "APPROVE",
+    "expected_has_defects": false,
+    "expected_has_screening_hits": false
+  },
+  {
+    "case_id": "ONB-GOLDEN-02",
+    "description": "Applicant with expired driver's license credential",
+    "applicant_type": "INDIVIDUAL",
+    "legal_name": "Marcus Aurelius",
+    "email": "marcus@example.com",
+    "declared_dob": "1980-04-26",
+    "declared_address": "1 Roman Forum, Rome, NY",
+    "documents": [
+      {
+        "doc_type": "DRIVERS_LICENSE",
+        "document_number": "DL994411",
+        "raw_content": "Drivers License for Marcus Aurelius expired in 2021",
+        "expiry_date": "2021-06-30",
+        "holder_name": "Marcus Aurelius"
+      }
+    ],
+    "expected_risk_rating": "HIGH",
+    "expected_action": "ESCALATE_TO_ANALYST",
+    "expected_has_defects": true,
+    "expected_has_screening_hits": false
+  },
+  {
+    "case_id": "ONB-GOLDEN-03",
+    "description": "Name mismatch between application and identity credential",
+    "applicant_type": "INDIVIDUAL",
+    "legal_name": "Edward Norton",
+    "email": "edward@example.com",
+    "declared_dob": "1975-01-12",
+    "declared_address": "789 Pine Ave, Boston, MA",
+    "documents": [
+      {
+        "doc_type": "NATIONAL_ID",
+        "document_number": "ID998877",
+        "raw_content": "ID Card: Charles Montgomery",
+        "expiry_date": "2032-12-31",
+        "holder_name": "Charles Montgomery"
+      }
+    ],
+    "expected_risk_rating": "HIGH",
+    "expected_action": "ESCALATE_TO_ANALYST",
+    "expected_has_defects": true,
+    "expected_has_screening_hits": false
+  },
+  {
+    "case_id": "ONB-GOLDEN-04",
+    "description": "Commercial entity with OFAC SDN sanctioned beneficial owner",
+    "applicant_type": "BUSINESS",
+    "legal_name": "NorthStar Maritime Holdings Ltd",
+    "email": "compliance@northstar.cy",
+    "declared_address": "12 Harbor Way, Limassol, Cyprus",
+    "business_registration_number": "REG-109283",
+    "declared_beneficial_owners": ["Viktor Anatolyevich Petrov"],
+    "documents": [
+      {
+        "doc_type": "COMPANY_REGISTRATION",
+        "document_number": "REG-109283",
+        "raw_content": "Company Registry Extract: NorthStar Maritime Holdings Ltd Beneficial Owners: Viktor Anatolyevich Petrov",
+        "expiry_date": "2035-01-01",
+        "holder_name": "NorthStar Maritime Holdings Ltd"
+      }
+    ],
+    "expected_risk_rating": "CRITICAL",
+    "expected_action": "REJECT",
+    "expected_has_defects": true,
+    "expected_has_screening_hits": true
+  },
+  {
+    "case_id": "ONB-GOLDEN-05",
+    "description": "Clean commercial enterprise with active Delaware registration",
+    "applicant_type": "BUSINESS",
+    "legal_name": "Apex Cloud Technologies LLC",
+    "email": "treasury@apexcloud.io",
+    "declared_address": "100 Tech Blvd, Wilmington, DE",
+    "business_registration_number": "REG-109283",
+    "declared_beneficial_owners": ["Sarah Jenkins", "David Miller"],
+    "documents": [
+      {
+        "doc_type": "COMPANY_REGISTRATION",
+        "document_number": "REG-109283",
+        "raw_content": "Company Registry Extract: Apex Cloud Technologies LLC Active in Delaware",
+        "expiry_date": "2035-01-01",
+        "holder_name": "Apex Cloud Technologies LLC"
+      }
+    ],
+    "expected_risk_rating": "LOW",
+    "expected_action": "APPROVE",
+    "expected_has_defects": false,
+    "expected_has_screening_hits": false
+  }
+]

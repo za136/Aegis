@@ -1,0 +1,38 @@
+[
+  {
+    "case_id": "AML-GOLDEN-01",
+    "description": "Structuring / Smurfing just under $10,000 threshold followed by offshore wire",
+    "alert_id": "alt_struct_001",
+    "account_number": "US12MERI0009988",
+    "customer_id": "cust_john_doe",
+    "expected_typology": "STRUCTURING",
+    "expected_disposition": "FILE_SAR",
+    "is_truly_suspicious": true,
+    "expected_statutory_citation": "31 U.S.C. § 5324",
+    "minimum_expected_evidence_count": 2
+  },
+  {
+    "case_id": "AML-GOLDEN-02",
+    "description": "Rapid in-and-out pass-through movement with near-zero retention",
+    "alert_id": "alt_rapid_002",
+    "account_number": "US12MERI0005544",
+    "customer_id": "cust_fast_flow",
+    "expected_typology": "RAPID_MOVEMENT",
+    "expected_disposition": "FILE_SAR",
+    "is_truly_suspicious": true,
+    "expected_statutory_citation": "FATF Recommendation 16",
+    "minimum_expected_evidence_count": 2
+  },
+  {
+    "case_id": "AML-GOLDEN-03",
+    "description": "Benign commercial payroll distribution (non-suspicious high volume)",
+    "alert_id": "alt_benign_payroll",
+    "account_number": "US12MERI0001001",
+    "customer_id": "cust_meridian_payroll",
+    "expected_typology": "UNUSUAL_VOLUME",
+    "expected_disposition": "CLOSE_NO_ACTION",
+    "is_truly_suspicious": false,
+    "expected_statutory_citation": null,
+    "minimum_expected_evidence_count": 0
+  }
+]
